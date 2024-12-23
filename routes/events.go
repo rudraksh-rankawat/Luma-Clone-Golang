@@ -10,7 +10,6 @@ import (
 )
 
 func getEvent(context *gin.Context) {
-
 	events, err := models.GetAllEvents()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Unable to fetch the events. Try again later!"})
@@ -26,7 +25,6 @@ func getEventById(context *gin.Context) {
 		return
 	}
 	id := context.Param("id")
-
 	for _, event := range events {
 		eventId := fmt.Sprintf("%v", event.ID)
 		if eventId == id {
@@ -63,7 +61,6 @@ func updateEvent(c *gin.Context) {
 	//	c.JSON(http.StatusBadRequest, gin.H{"message": "Unable to get events"})
 	//	return
 	//}
-
 	//var id int64
 
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
