@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
+
 	"example.com/rest-api/db"
 	"example.com/rest-api/routes"
-	"fmt"
+	"example.com/rest-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,4 +19,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+
 }
