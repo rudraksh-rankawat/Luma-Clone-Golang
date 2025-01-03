@@ -13,10 +13,10 @@ type Event struct {
 	Description string `binding:"required"`
 	Location    string `binding:"required"`
 	DateTime    time.Time
-	UserID      int
+	UserID      int64
 }
 
-func (e Event) Save() (int64, error) {
+func (e *Event) Save() (int64, error) {
 	query := `
 	INSERT INTO events(name, description, location, dateTime, user_id)
 	VALUES (?, ?, ?, ?, ?)`
@@ -107,8 +107,8 @@ func (event Event) Delete() error {
 
 }
 
-func DeleteAllEvents() error {
-	query := `DELETE FROM events`
-	_, err := db.DB.Exec(query)
-	return err
-}
+// func DeleteAllEvents() error {
+// 	query := `DELETE FROM events`
+// 	_, err := db.DB.Exec(query)
+// 	return err
+// }

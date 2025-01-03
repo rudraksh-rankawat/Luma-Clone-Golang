@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"example.com/rest-api/models"
+	"example.com/rest-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +32,8 @@ func loginUser(context *gin.Context) {
 	var user models.User
 	err := context.ShouldBindJSON(&user)
 
+	
+
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "invalid request"})
 		return
@@ -39,11 +42,19 @@ func loginUser(context *gin.Context) {
 	err = user.VerifyCredentials()
 
 	if err != nil {
-		fmt.Printf(`%v\n`, err)
 		context.JSON(http.StatusUnauthorized, gin.H{"message": "invalid credentials"})
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "login successful"})
+	token, err := utils.GenerateJWT(user.Email, user.ID)
+
+
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "invalid credentials"})
+		return
+	}
+	
+
+	context.JSON(http.StatusOK, gin.H{"message": "login successful", "token":token})
 
 }

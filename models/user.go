@@ -35,16 +35,16 @@ func (u User) Save() error {
 	return err
 }
 
-func (u User) VerifyCredentials() error {
+func (u *User) VerifyCredentials() error {
 	
 	query := `
-	SELECT password
+	SELECT password, id
 	FROM users
 	WHERE email = ?
 	`
 
 	var storedPass string
-	err := db.DB.QueryRow(query, u.Email).Scan(&storedPass)
+	err := db.DB.QueryRow(query, u.Email).Scan(&storedPass, &u.ID)
 
 	if err != nil {
 		return errors.New("user not found with the email")

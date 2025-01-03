@@ -1,12 +1,14 @@
 package routes
 
 import (
-	"example.com/rest-api/models"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"time"
+
+	"example.com/rest-api/models"
+	"example.com/rest-api/utils"
+	"github.com/gin-gonic/gin"
 )
 
 func getEvent(context *gin.Context) {
@@ -36,14 +38,30 @@ func getEventById(context *gin.Context) {
 }
 
 func createEvent(context *gin.Context) {
+
+	token := context.Request.Header.Get("Authorization")
+
+	if token == "" {
+		context.JSON(http.StatusUnauthorized, "Unauthorized request")
+		return
+	}
+
+	userId, err := utils.VerifyJWT(token)
+
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, "Unauthorize request")
+		return
+	}
+
+
 	var event models.Event
-	err := context.ShouldBindJSON(&event)
+	err = context.ShouldBindJSON(&event)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "unable to parse body"})
 		return
 	}
 
-	event.UserID = 1
+	event.UserID = userId
 	event.DateTime = time.Now()
 	var id int64
 	id, err = event.Save()
@@ -114,11 +132,11 @@ func deleteEventById(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Event of ID %v deleted successfully", id)})
 }
 
-func deleteAllEvents(ctx *gin.Context) {
-	err := models.DeleteAllEvents()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not delete all events. Try later!"})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "successfully deleted all events!"})
-}
+// func deleteAllEvents(ctx *gin.Context) {
+// 	err := models.DeleteAllEvents()
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not delete all events. Try later!"})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, gin.H{"message": "successfully deleted all events!"})
+// }
