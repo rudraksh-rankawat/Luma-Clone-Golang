@@ -27,34 +27,31 @@ func createUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "user created successfully!"})
 }
-
 func loginUser(context *gin.Context) {
 	var user models.User
 	err := context.ShouldBindJSON(&user)
-
-	
-
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "invalid request"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "invalid request"})
 		return
 	}
 
 	err = user.VerifyCredentials()
-
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"message": "invalid credentials"})
 		return
 	}
 
 	token, err := utils.GenerateJWT(user.Email, user.ID)
-
-
 	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "invalid credentials"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "could not create token"})
 		return
 	}
-	
 
-	context.JSON(http.StatusOK, gin.H{"message": "login successful", "token":token})
-
+	context.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"user": gin.H{
+			"id":    user.ID,
+			"email": user.Email,
+		},
+	})
 }
